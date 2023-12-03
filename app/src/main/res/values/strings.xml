@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Lazy Money</string>
+    <string name="greetings">Welcome back,</string>
+    <string name="current_balance">Current Balance</string>
+    <string name="bank_balance">Bank Balance</string>
+    <string name="cash">Cash</string>
+</resources>
