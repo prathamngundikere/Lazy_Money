@@ -4,4 +4,5 @@
     <string name="current_balance">Current Balance</string>
     <string name="bank_balance">Bank Balance</string>
     <string name="cash">Cash</string>
+    <string name="new_transaction">New Transaction</string>
 </resources>
