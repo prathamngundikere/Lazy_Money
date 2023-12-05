@@ -1,4 +1,4 @@
-package com.prathamngundikere.lazymoney.ux
+package com.prathamngundikere.lazymoney.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -50,6 +50,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import com.prathamngundikere.lazymoney.R
+import com.prathamngundikere.lazymoney.ux.presentation.TransactionEvent
+import com.prathamngundikere.lazymoney.ux.presentation.TransactionState
 
 enum class TransactionType {
     INCOME, EXPENDITURE
@@ -60,7 +62,10 @@ enum class PaymentMethod {
 }
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun InputScreen() {
+fun InputScreen(
+    state: TransactionState,
+    onEvent: (TransactionEvent) -> Unit
+) {
     var transactionType by remember { mutableStateOf(TransactionType.INCOME) }
     var paymentMethod by remember { mutableStateOf(PaymentMethod.CASH) }
     var transactionTitle by remember { mutableStateOf("") }
@@ -94,7 +99,17 @@ fun InputScreen() {
             FloatingActionButton(
                 containerColor = MaterialTheme.colorScheme.primary,
                 onClick = {
-                    // Handle the values here
+                    if (state.name.value.isNotEmpty() && state.amount.value != 0.0) {
+                        // Handle the values here
+                        onEvent(
+                            TransactionEvent.SaveTransaction(
+                                type = state.type.value,
+                                name = state.name.value,
+                                amount = state.amount.value,
+                                paymentMethod = state.paymentMethod.value
+                            )
+                        )
+                    }
                 }
             ) {
                 Icon(
@@ -123,7 +138,10 @@ fun InputScreen() {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         RadioButton(
                             selected = transactionType == TransactionType.INCOME,
-                            onClick = { transactionType = TransactionType.INCOME },
+                            onClick = {
+                                transactionType = TransactionType.INCOME
+                                state.type.value = "Income"
+                                      },
                             colors = RadioButtonDefaults.colors(MaterialTheme.colorScheme.primary)
                         )
                         Text("Income")
@@ -131,7 +149,10 @@ fun InputScreen() {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         RadioButton(
                             selected = transactionType == TransactionType.EXPENDITURE,
-                            onClick = { transactionType = TransactionType.EXPENDITURE },
+                            onClick = {
+                                transactionType = TransactionType.EXPENDITURE
+                                state.type.value = "Expenditure"
+                                      },
                             colors = RadioButtonDefaults.colors(MaterialTheme.colorScheme.primary)
                         )
                         Text("Expenditure")
@@ -151,7 +172,10 @@ fun InputScreen() {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         RadioButton(
                             selected = paymentMethod == PaymentMethod.CASH,
-                            onClick = { paymentMethod = PaymentMethod.CASH },
+                            onClick = {
+                                paymentMethod = PaymentMethod.CASH
+                                state.paymentMethod.value = "Cash"
+                                      },
                             colors = RadioButtonDefaults.colors(MaterialTheme.colorScheme.primary)
                         )
                         Text("Cash")
@@ -159,7 +183,10 @@ fun InputScreen() {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         RadioButton(
                             selected = paymentMethod == PaymentMethod.CARD,
-                            onClick = { paymentMethod = PaymentMethod.CARD },
+                            onClick = {
+                                paymentMethod = PaymentMethod.CARD
+                                state.paymentMethod.value = "Card"
+                                      },
                             colors = RadioButtonDefaults.colors(MaterialTheme.colorScheme.primary)
                         )
                         Text("Card")
@@ -169,7 +196,10 @@ fun InputScreen() {
             // Transaction Title Input
             OutlinedTextField(
                 value = transactionTitle,
-                onValueChange = { transactionTitle = it },
+                onValueChange = {
+                    transactionTitle = it
+                    state.name.value = it
+                                },
                 label = { Text("Transaction Title") },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -187,7 +217,14 @@ fun InputScreen() {
             // Transaction Amount Input
             OutlinedTextField(
                 value = transactionAmount,
-                onValueChange = { transactionAmount = it },
+                onValueChange = {
+                    transactionAmount = it
+                    state.amount.value = if (it.isNotEmpty()) {
+                        it.toDouble()
+                    } else {
+                        0.0 // or any default value you prefer
+                    }
+                                },
                 label = { Text("Transaction Amount") },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -202,30 +239,8 @@ fun InputScreen() {
                     }
                 )
             )
-
-            // Transaction Date Input
-            OutlinedTextField(
-                value = transactionDate,
-                onValueChange = { transactionDate = it },
-                label = { Text("Transaction Date") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        keyboardController?.hide()
-                    }
-                )
-            )
         }
     }
 }
-@Preview(showBackground = true)
-@Composable
-fun TransactionScreenPreview() {
-    InputScreen()
-}
+
 
