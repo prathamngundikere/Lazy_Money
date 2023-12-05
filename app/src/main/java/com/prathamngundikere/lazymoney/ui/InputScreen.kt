@@ -52,7 +52,7 @@ import androidx.compose.ui.unit.toSize
 import com.prathamngundikere.lazymoney.R
 import com.prathamngundikere.lazymoney.ux.presentation.TransactionEvent
 import com.prathamngundikere.lazymoney.ux.presentation.TransactionState
-
+//stable
 enum class TransactionType {
     INCOME, EXPENDITURE
 }
