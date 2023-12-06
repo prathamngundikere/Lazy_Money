@@ -15,7 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
+import com.prathamngundikere.lazymoney.ui.Dashboard
 import com.prathamngundikere.lazymoney.ui.InputScreen
 import com.prathamngundikere.lazymoney.ui.theme.LazyMoneyTheme
 import com.prathamngundikere.lazymoney.ux.data.TransactionDatabase
@@ -42,16 +46,32 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val state by viewModel.state.collectAsState()
+            val navController = rememberNavController()
             LazyMoneyTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    InputScreen(
-                        state = state,
-                        onEvent = viewModel::onEvent
-                    )
+                    NavHost(
+                        navController = navController ,
+                        startDestination = "Dashboard"
+                    ) {
+                        composable("Dashboard") {
+                            Dashboard(
+                                state = state,
+                                navController = navController,
+                                onEvent = viewModel::onEvent
+                            )
+                        }
+                        composable("InputScreen") {
+                            InputScreen(
+                                state = state,
+                                navController = navController,
+                                onEvent = viewModel::onEvent
+                            )
+                        }
+                    }
                 }
             }
         }

@@ -39,6 +39,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.prathamngundikere.lazymoney.R
 import com.prathamngundikere.lazymoney.ux.presentation.TransactionEvent
 import com.prathamngundikere.lazymoney.ux.presentation.TransactionState
@@ -54,6 +55,7 @@ enum class PaymentMethod {
 @Composable
 fun InputScreen(
     state: TransactionState,
+    navController: NavController,
     onEvent: (TransactionEvent) -> Unit
 ) {
     var transactionType by remember { mutableStateOf(TransactionType.INCOME) }
@@ -97,6 +99,7 @@ fun InputScreen(
                                 paymentMethod = state.paymentMethod.value
                             )
                         )
+                        navController.popBackStack()
                     }
                 }
             ) {
