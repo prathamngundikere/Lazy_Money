@@ -118,6 +118,13 @@ fun Dashboard(
                 }
             }
             item { TransactionList() }
+            items(state.transactions.size) {index ->
+                TransactionItem(
+                    state = state,
+                    index = index,
+                    onEvent = onEvent
+                )
+            }
         }
     }
 }
@@ -181,7 +188,11 @@ fun TransactionList(
 }
 
 @Composable
-fun TransactionItem() {
+fun TransactionItem(
+    state: TransactionState,
+    index: Int,
+    onEvent: (TransactionEvent) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -193,7 +204,7 @@ fun TransactionItem() {
             modifier = Modifier.weight(1f)
         ) {
             Text(
-                text = "Hello",
+                text = state.transactions[index].name,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
@@ -208,7 +219,7 @@ fun TransactionItem() {
             )
         }
         Text(
-            text = "20",
+            text = state.transactions[index].amount.toString(),
             fontSize = 27.sp,
             fontWeight = FontWeight.ExtraBold
         )
