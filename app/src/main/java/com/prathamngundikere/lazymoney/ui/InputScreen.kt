@@ -1,28 +1,23 @@
 package com.prathamngundikere.lazymoney.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
@@ -37,18 +32,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.toSize
 import com.prathamngundikere.lazymoney.R
 import com.prathamngundikere.lazymoney.ux.presentation.TransactionEvent
 import com.prathamngundikere.lazymoney.ux.presentation.TransactionState
@@ -72,8 +62,6 @@ fun InputScreen(
     var transactionAmount by remember { mutableStateOf("") }
     var transactionDate by remember { mutableStateOf("")}
 
-
-    val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
     Scaffold (
         topBar = {
@@ -120,125 +108,130 @@ fun InputScreen(
             }
         }
     ) {
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
                 .padding(16.dp)
         ) {
-            // Choose Income or Expenditure
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                Text("Transaction Type")
-                Column {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        RadioButton(
-                            selected = transactionType == TransactionType.INCOME,
-                            onClick = {
-                                transactionType = TransactionType.INCOME
-                                state.type.value = "Income"
-                                      },
-                            colors = RadioButtonDefaults.colors(MaterialTheme.colorScheme.primary)
-                        )
-                        Text("Income")
-                    }
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        RadioButton(
-                            selected = transactionType == TransactionType.EXPENDITURE,
-                            onClick = {
-                                transactionType = TransactionType.EXPENDITURE
-                                state.type.value = "Expenditure"
-                                      },
-                            colors = RadioButtonDefaults.colors(MaterialTheme.colorScheme.primary)
-                        )
-                        Text("Expenditure")
+            item {
+                // Choose Income or Expenditure
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text("Transaction Type")
+                    Column {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(
+                                selected = transactionType == TransactionType.INCOME,
+                                onClick = {
+                                    transactionType = TransactionType.INCOME
+                                    state.type.value = "Income"
+                                },
+                                colors = RadioButtonDefaults.colors(MaterialTheme.colorScheme.primary)
+                            )
+                            Text("Income")
+                        }
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(
+                                selected = transactionType == TransactionType.EXPENDITURE,
+                                onClick = {
+                                    transactionType = TransactionType.EXPENDITURE
+                                    state.type.value = "Expenditure"
+                                },
+                                colors = RadioButtonDefaults.colors(MaterialTheme.colorScheme.primary)
+                            )
+                            Text("Expenditure")
+                        }
                     }
                 }
             }
-
-            // Choose Cash or Card
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                Text("Payment Method")
-                Column {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        RadioButton(
-                            selected = paymentMethod == PaymentMethod.CASH,
-                            onClick = {
-                                paymentMethod = PaymentMethod.CASH
-                                state.paymentMethod.value = "Cash"
-                                      },
-                            colors = RadioButtonDefaults.colors(MaterialTheme.colorScheme.primary)
-                        )
-                        Text("Cash")
-                    }
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        RadioButton(
-                            selected = paymentMethod == PaymentMethod.CARD,
-                            onClick = {
-                                paymentMethod = PaymentMethod.CARD
-                                state.paymentMethod.value = "Card"
-                                      },
-                            colors = RadioButtonDefaults.colors(MaterialTheme.colorScheme.primary)
-                        )
-                        Text("Card")
+            item {
+                // Choose Cash or Card
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text("Payment Method")
+                    Column {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(
+                                selected = paymentMethod == PaymentMethod.CASH,
+                                onClick = {
+                                    paymentMethod = PaymentMethod.CASH
+                                    state.paymentMethod.value = "Cash"
+                                },
+                                colors = RadioButtonDefaults.colors(MaterialTheme.colorScheme.primary)
+                            )
+                            Text("Cash")
+                        }
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(
+                                selected = paymentMethod == PaymentMethod.CARD,
+                                onClick = {
+                                    paymentMethod = PaymentMethod.CARD
+                                    state.paymentMethod.value = "Card"
+                                },
+                                colors = RadioButtonDefaults.colors(MaterialTheme.colorScheme.primary)
+                            )
+                            Text("Card")
+                        }
                     }
                 }
             }
-            // Transaction Title Input
-            OutlinedTextField(
-                value = transactionTitle,
-                onValueChange = {
-                    transactionTitle = it
-                    state.name.value = it
-                                },
-                label = { Text("Transaction Title") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        keyboardController?.hide()
-                    }
+            item {
+                // Transaction Title Input
+                OutlinedTextField(
+                    value = transactionTitle,
+                    onValueChange = { it ->
+                        transactionTitle = it
+                        state.name.value = it
+                    },
+                    label = { Text("Transaction Title") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboardController?.hide()
+                        }
+                    )
                 )
-            )
 
-            // Transaction Amount Input
-            OutlinedTextField(
-                value = transactionAmount,
-                onValueChange = {
-                    transactionAmount = it
-                    state.amount.value = if (it.isNotEmpty()) {
-                        it.toDouble()
-                    } else {
-                        0.0 // or any default value you prefer
-                    }
-                                },
-                label = { Text("Transaction Amount") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        keyboardController?.hide()
-                    }
+                // Transaction Amount Input
+                OutlinedTextField(
+                    value = transactionAmount,
+                    onValueChange = {
+                        transactionAmount = it
+                        state.amount.value = if (it.isNotEmpty()) {
+                            it.toDouble()
+                        } else {
+                            0.0 // or any default value you prefer
+                        }
+                    },
+                    label = { Text("Transaction Amount") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboardController?.hide()
+                        }
+                    )
                 )
-            )
+            }
         }
     }
 }
