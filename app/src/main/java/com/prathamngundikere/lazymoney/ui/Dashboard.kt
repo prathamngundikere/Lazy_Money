@@ -15,12 +15,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.NavigateNext
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -29,18 +27,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.prathamngundikere.lazymoney.R
+import com.prathamngundikere.lazymoney.ux.data.TransactionEntity
 import com.prathamngundikere.lazymoney.ux.presentation.TransactionEvent
 import com.prathamngundikere.lazymoney.ux.presentation.TransactionState
 
@@ -51,6 +53,37 @@ fun Dashboard(
     navController: NavController,
     onEvent: (TransactionEvent) -> Unit
 ) {
+    var currentBalance by rememberSaveable {
+        mutableDoubleStateOf(0.0)
+    }
+    var cardBalance by rememberSaveable {
+        mutableDoubleStateOf(0.0)
+    }
+    var cashBalance by rememberSaveable {
+        mutableDoubleStateOf(0.0)
+    }
+    /*for(i in 0 until state.transactions.size){
+        if(state.transactions[i].type == "Income"){
+            currentBalance += state.transactions[i].amount
+        } else if(state.transactions[i].type == "Expenditure"){
+            currentBalance -= state.transactions[i].amount
+        }
+    }
+    for(i in 0 until state.transactions.size) {
+        if(state.transactions[i].paymentMethod == "Card") {
+            if(state.transactions[i].type == "Income"){
+                cardBalance += state.transactions[i].amount
+            } else if(state.transactions[i].type == "Expenditure"){
+                cardBalance -= state.transactions[i].amount
+            }
+        } else if(state.transactions[i].paymentMethod == "Cash") {
+            if(state.transactions[i].type == "Income"){
+                cashBalance += state.transactions[i].amount
+            } else if(state.transactions[i].type == "Expenditure"){
+                cashBalance -= state.transactions[i].amount
+            }
+        }
+    }*/
     Scaffold(
         topBar = {
             Row(
@@ -89,6 +122,12 @@ fun Dashboard(
             }
         }
     ) {paddingValues ->
+        val currentBalance = calculateBalance(state.transactions, "Income") -
+                calculateBalance(state.transactions, "Expenditure")
+        val cardBalance = calculateBalance(state.transactions, "Income", "Card") -
+                calculateBalance(state.transactions, "Expenditure", "Card")
+        val cashBalance = calculateBalance(state.transactions, "Income", "Cash") -
+                calculateBalance(state.transactions, "Expenditure", "Cash")
         LazyColumn(
             contentPadding = paddingValues,
             modifier = Modifier
@@ -97,7 +136,7 @@ fun Dashboard(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item{
-                CurrentBalance(cb = 25000.0)
+                CurrentBalance(cb = currentBalance)
             }
             item {
                 Row(
@@ -108,12 +147,12 @@ fun Dashboard(
                 ) {
                     BalanceCard(
                         icon = Icons.Filled.AccountBalance,
-                        balance = 25000.0,
+                        balance = cardBalance,
                         typeName = "Bank Balance"
                     )
                     BalanceCard(
                         icon = Icons.Filled.Payments,
-                        balance = 678.0,
+                        balance = cashBalance,
                         typeName = "Cash"
                     )
                 }
@@ -140,6 +179,12 @@ fun Dashboard(
         }
     }
 }
+fun calculateBalance(transactions: List<TransactionEntity>, type: String, paymentMethod: String? = null): Double {
+    return transactions
+        .filter { it.type == type && (paymentMethod.isNullOrBlank() || it.paymentMethod == paymentMethod) }
+        .sumByDouble { if (type == "Income") it.amount else it.amount }
+}
+
 
 @Composable
 fun CurrentBalance(
@@ -149,7 +194,7 @@ fun CurrentBalance(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(5.dp),
+            .padding(10.dp),
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondary),
         shape = RoundedCornerShape(10.dp)
     ) {
@@ -162,8 +207,9 @@ fun CurrentBalance(
             )
             Text(
                 text = cb.toString(),
-                fontSize = 25.sp,
-                color = MaterialTheme.colorScheme.inverseOnSurface
+                fontSize = 30.sp,
+                color = MaterialTheme.colorScheme.inverseOnSurface,
+                fontWeight = FontWeight.ExtraBold
             )
         }
     }
@@ -177,13 +223,26 @@ fun BalanceCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier
-            .padding(5.dp)
+        modifier = Modifier
+            .fillMaxWidth(0.5f)
+            .padding(12.dp),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondary),
+        shape = RoundedCornerShape(10.dp)
     ) {
         Column {
-            Icon(imageVector = icon , contentDescription = "")
-            Text(text = balance.toString())
-            Text(text = typeName)
+            Icon(imageVector = icon , contentDescription = "", tint = MaterialTheme.colorScheme.onSecondary)
+            Text(
+                text = balance.toString(),
+                color = MaterialTheme.colorScheme.onSecondary,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = typeName,
+                color = MaterialTheme.colorScheme.onSecondary,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
@@ -225,7 +284,7 @@ fun TransactionItem(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "${state.transactions[index].type},${state.transactions[index].paymentMethod}",
+                text = "${state.transactions[index].paymentMethod},${state.transactions[index].dateTime}",
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
@@ -233,7 +292,8 @@ fun TransactionItem(
         Text(
             text = state.transactions[index].amount.toString(),
             fontSize = 27.sp,
-            fontWeight = FontWeight.ExtraBold
+            fontWeight = FontWeight.ExtraBold,
+            color = if (state.transactions[index].type == "Income") Color.Green else Color.Red
         )
     }
 }
