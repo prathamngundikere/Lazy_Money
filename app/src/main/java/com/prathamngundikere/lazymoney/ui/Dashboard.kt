@@ -2,6 +2,7 @@ package com.prathamngundikere.lazymoney.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -125,6 +126,17 @@ fun Dashboard(
                     onEvent = onEvent
                 )
             }
+            item {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(text = "End of the list",
+                        color = MaterialTheme.colorScheme.primary)
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp))
+                }
+            }
         }
     }
 }
@@ -213,9 +225,9 @@ fun TransactionItem(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Time",
-                fontSize = 8.sp,
-                color = Color.DarkGray
+                text = "${state.transactions[index].type},${state.transactions[index].paymentMethod}",
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
             )
         }
         Text(
