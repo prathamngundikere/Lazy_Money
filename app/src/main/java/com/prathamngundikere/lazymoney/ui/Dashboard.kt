@@ -48,6 +48,10 @@ import com.prathamngundikere.lazymoney.R
 import com.prathamngundikere.lazymoney.ux.data.TransactionEntity
 import com.prathamngundikere.lazymoney.ux.presentation.TransactionEvent
 import com.prathamngundikere.lazymoney.ux.presentation.TransactionState
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,28 +69,6 @@ fun Dashboard(
     var cashBalance by rememberSaveable {
         mutableDoubleStateOf(0.0)
     }
-    /*for(i in 0 until state.transactions.size){
-        if(state.transactions[i].type == "Income"){
-            currentBalance += state.transactions[i].amount
-        } else if(state.transactions[i].type == "Expenditure"){
-            currentBalance -= state.transactions[i].amount
-        }
-    }
-    for(i in 0 until state.transactions.size) {
-        if(state.transactions[i].paymentMethod == "Card") {
-            if(state.transactions[i].type == "Income"){
-                cardBalance += state.transactions[i].amount
-            } else if(state.transactions[i].type == "Expenditure"){
-                cardBalance -= state.transactions[i].amount
-            }
-        } else if(state.transactions[i].paymentMethod == "Cash") {
-            if(state.transactions[i].type == "Income"){
-                cashBalance += state.transactions[i].amount
-            } else if(state.transactions[i].type == "Expenditure"){
-                cashBalance -= state.transactions[i].amount
-            }
-        }
-    }*/
     Scaffold(
         topBar = {
             Row(
@@ -131,6 +113,7 @@ fun Dashboard(
                 calculateBalance(state.transactions, "Expenditure", "Card")
         val cashBalance = calculateBalance(state.transactions, "Income", "Cash") -
                 calculateBalance(state.transactions, "Expenditure", "Cash")
+
         LazyColumn(
             contentPadding = paddingValues,
             modifier = Modifier
@@ -214,7 +197,7 @@ fun CurrentBalance(
             )
             Text(
                 text = "₹${cb.toString()}0",
-                fontSize = 45.sp,
+                fontSize = 55.sp,
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.ExtraBold,
                 modifier = Modifier
@@ -293,12 +276,22 @@ fun TransactionItem(
     index: Int,
     onEvent: (TransactionEvent) -> Unit
 ) {
+    // Convert milliseconds to LocalDateTime
+    val localDateTime = LocalDateTime.ofInstant(
+        Instant.ofEpochMilli(state.transactions[index].dateTime),
+        ZoneId.systemDefault()
+    )
+
+    // Format LocalDateTime to display date, month, and year
+    val formattedDateTime = localDateTime.format(DateTimeFormatter.ofPattern("dd MMMM yyyy-HH:mm:ss"))
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(10.dp))
             .background(MaterialTheme.colorScheme.primaryContainer)
-            .padding(12.dp)
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
             modifier = Modifier.weight(1f)
@@ -313,7 +306,15 @@ fun TransactionItem(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "${state.transactions[index].paymentMethod},${state.transactions[index].dateTime}",
+                text = "${state.transactions[index].paymentMethod}",
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "${formattedDateTime}",
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
