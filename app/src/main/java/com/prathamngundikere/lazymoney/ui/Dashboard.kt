@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -38,6 +39,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -139,16 +142,16 @@ fun Dashboard(
                 CurrentBalance(cb = currentBalance)
             }
             item {
-                Row(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(5.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    verticalArrangement = Arrangement.SpaceEvenly
                 ) {
                     BalanceCard(
                         icon = Icons.Filled.AccountBalance,
                         balance = cardBalance,
-                        typeName = "Bank Balance"
+                        typeName = "Card"
                     )
                     BalanceCard(
                         icon = Icons.Filled.Payments,
@@ -191,25 +194,31 @@ fun CurrentBalance(
     modifier: Modifier = Modifier,
     cb: Double
 ) {
-    Card(
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(10.dp),
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondary),
-        shape = RoundedCornerShape(10.dp)
+            .padding(top = 10.dp, start = 10.dp, end = 10.dp)
+            .background(MaterialTheme.colorScheme.surface),
+        contentAlignment = Alignment.Center
     ) {
-        Column {
+        Column(
+            modifier = modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
             Text(
-                text = "Current Balance",
+                text = "Total Balance",
                 fontSize = 20.sp,
-                color = MaterialTheme.colorScheme.onSecondary,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.SemiBold
             )
             Text(
-                text = cb.toString(),
-                fontSize = 30.sp,
-                color = MaterialTheme.colorScheme.inverseOnSurface,
-                fontWeight = FontWeight.ExtraBold
+                text = "₹${cb.toString()}0",
+                fontSize = 45.sp,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.ExtraBold,
+                modifier = Modifier
+                    .padding(20.dp)
             )
         }
     }
@@ -224,24 +233,32 @@ fun BalanceCard(
 ) {
     Card(
         modifier = Modifier
-            .fillMaxWidth(0.5f)
+            .fillMaxWidth()
             .padding(12.dp),
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondary),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.inversePrimary),
         shape = RoundedCornerShape(10.dp)
     ) {
-        Column {
-            Icon(imageVector = icon , contentDescription = "", tint = MaterialTheme.colorScheme.onSecondary)
+        Column(modifier = Modifier.padding(10.dp)) {
+            Icon(
+                imageVector = icon ,
+                contentDescription = "",
+                tint = MaterialTheme.colorScheme.onPrimaryContainer
+            )
             Text(
-                text = balance.toString(),
-                color = MaterialTheme.colorScheme.onSecondary,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
+                text = "₹${balance.toString()}0",
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                fontSize = 35.sp,
+                fontWeight = FontWeight.ExtraBold,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
             )
             Text(
                 text = typeName,
-                color = MaterialTheme.colorScheme.onSecondary,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
             )
         }
     }
@@ -251,10 +268,22 @@ fun BalanceCard(
 fun TransactionList(
     modifier: Modifier = Modifier
 ) {
-    Row {
-        Icon(imageVector = Icons.Filled.ReceiptLong, contentDescription = "")
-        Text(text = "Transactions")
-        Icon(imageVector = Icons.Filled.NavigateNext, contentDescription = "")
+    Row (
+        modifier = Modifier
+            .fillMaxWidth()
+    ){
+        Text(
+            text = "Transactions",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier
+                .weight(1f)
+        )
+        Icon(
+            imageVector = Icons.Filled.NavigateNext,
+            contentDescription = "",
+            Modifier.size(30.dp)
+        )
     }
 }
 
@@ -290,10 +319,16 @@ fun TransactionItem(
             )
         }
         Text(
-            text = state.transactions[index].amount.toString(),
+            text = "₹${state.transactions[index].amount.toString()}0",
             fontSize = 27.sp,
             fontWeight = FontWeight.ExtraBold,
             color = if (state.transactions[index].type == "Income") Color.Green else Color.Red
         )
     }
+}
+
+@Preview
+@Composable
+fun preview() {
+    TransactionList()
 }
