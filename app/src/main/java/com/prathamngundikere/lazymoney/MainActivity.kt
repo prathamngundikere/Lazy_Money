@@ -21,6 +21,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.prathamngundikere.lazymoney.ui.Dashboard
 import com.prathamngundikere.lazymoney.ui.InputScreen
+import com.prathamngundikere.lazymoney.ui.TransactionScreen
 import com.prathamngundikere.lazymoney.ui.theme.LazyMoneyTheme
 import com.prathamngundikere.lazymoney.ux.data.TransactionDatabase
 import com.prathamngundikere.lazymoney.ux.presentation.TransactionsViewModel
@@ -66,6 +67,13 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("InputScreen") {
                             InputScreen(
+                                state = state,
+                                navController = navController,
+                                onEvent = viewModel::onEvent
+                            )
+                        }
+                        composable("TransactionScreen") {
+                            TransactionScreen(
                                 state = state,
                                 navController = navController,
                                 onEvent = viewModel::onEvent

@@ -1,6 +1,7 @@
 package com.prathamngundikere.lazymoney.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -143,7 +144,7 @@ fun Dashboard(
                     )
                 }
             }
-            item { TransactionList() }
+            item { TransactionList(navController = navController) }
             items(state.transactions.size) {index ->
                 TransactionItem(
                     state = state,
@@ -249,7 +250,8 @@ fun BalanceCard(
 
 @Composable
 fun TransactionList(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavController
 ) {
     Row (
         modifier = Modifier
@@ -265,7 +267,9 @@ fun TransactionList(
         Icon(
             imageVector = Icons.Filled.NavigateNext,
             contentDescription = "",
-            Modifier.size(30.dp)
+            Modifier.size(30.dp).clickable {
+                navController.navigate("TransactionScreen")
+            }
         )
     }
 }
@@ -326,10 +330,4 @@ fun TransactionItem(
             color = if (state.transactions[index].type == "Income") Color.Green else Color.Red
         )
     }
-}
-
-@Preview
-@Composable
-fun preview() {
-    TransactionList()
 }
