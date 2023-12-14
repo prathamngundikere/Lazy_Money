@@ -1,5 +1,11 @@
 package com.prathamngundikere.lazymoney.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,25 +18,31 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.NavigateNext
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.ReceiptLong
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -156,11 +168,11 @@ fun Dashboard(
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = "End of the list",
-                        color = MaterialTheme.colorScheme.primary)
                     Box(modifier = Modifier
                         .fillMaxWidth()
                         .height(100.dp))
+                    Text(text = "End of the list",
+                        color = MaterialTheme.colorScheme.primary)
                 }
             }
         }
@@ -264,13 +276,12 @@ fun TransactionList(
             modifier = Modifier
                 .weight(1f)
         )
-        Icon(
-            imageVector = Icons.Filled.NavigateNext,
-            contentDescription = "",
-            Modifier.size(30.dp).clickable {
-                navController.navigate("TransactionScreen")
-            }
-        )
+        IconButton(onClick = { navController.navigate("TransactionScreen") }) {
+            Icon(
+                imageVector = Icons.Filled.NavigateNext,
+                contentDescription = ""
+            )
+        }
     }
 }
 
@@ -280,6 +291,7 @@ fun TransactionItem(
     index: Int,
     onEvent: (TransactionEvent) -> Unit
 ) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
     // Convert milliseconds to LocalDateTime
     val localDateTime = LocalDateTime.ofInstant(
         Instant.ofEpochMilli(state.transactions[index].dateTime),
@@ -289,45 +301,89 @@ fun TransactionItem(
     // Format LocalDateTime to display date, month, and year
     val formattedDateTime = localDateTime.format(DateTimeFormatter.ofPattern("dd MMMM yyyy-HH:mm:ss"))
 
-    Row(
+    Card(
         modifier = Modifier
+            .clickable { expanded = !expanded }
             .fillMaxWidth()
             .clip(RoundedCornerShape(10.dp))
-            .background(MaterialTheme.colorScheme.primaryContainer)
-            .padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .background(MaterialTheme.colorScheme.secondaryContainer)
+            .padding(12.dp)
+            .animateContentSize(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioHighBouncy,
+                    stiffness = Spring.StiffnessLow
+                )
+            )
     ) {
         Column(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .fillMaxWidth()
+                //.clickable { expanded = !expanded }
+                .background(MaterialTheme.colorScheme.secondaryContainer)
         ) {
-            Text(
-                text = state.transactions[index].name,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = state.transactions[index].name,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
 
-            Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = "${state.transactions[index].paymentMethod}",
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
-            )
+                    Text(
+                        text = "${state.transactions[index].paymentMethod}",
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
 
-            Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = "${formattedDateTime}",
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
-            )
+                    Text(
+                        text = "${formattedDateTime}",
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+
+
+                }
+                Text(
+                    text = "₹${state.transactions[index].amount.toString()}0",
+                    fontSize = 27.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = if (state.transactions[index].type == "Income") Color.Green else Color.Red
+                )
+            }
+
+            // Animated content for expansion
+            AnimatedVisibility(
+                visible = expanded,
+                enter = expandVertically(),
+                exit = shrinkVertically()
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Button(
+                        onClick = {
+                            onEvent(TransactionEvent.DeleteTransaction(state.transactions[index]))
+                                  },
+                        modifier = Modifier
+                            .size(width = 125.dp, height = 50.dp)
+                    ) {
+                        Text(text = "Delete")
+                        Spacer(modifier = Modifier.width(5.dp))
+                        Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+                    }
+                }
+            }
         }
-        Text(
-            text = "₹${state.transactions[index].amount.toString()}0",
-            fontSize = 27.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = if (state.transactions[index].type == "Income") Color.Green else Color.Red
-        )
     }
 }
