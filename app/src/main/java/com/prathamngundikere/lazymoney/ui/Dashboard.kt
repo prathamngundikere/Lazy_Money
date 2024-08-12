@@ -95,7 +95,6 @@ fun Dashboard(
                 Text(
                     text = stringResource(R.string.app_name),
                     modifier = Modifier.weight(1f),
-                    fontSize = 17.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
@@ -144,16 +143,16 @@ fun Dashboard(
                         .padding(5.dp),
                     verticalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    BalanceCard(
+                    /*BalanceCard(
                         icon = Icons.Filled.AccountBalance,
                         balance = cardBalance,
                         typeName = "Card"
-                    )
-                    BalanceCard(
+                    )*/
+                    /*BalanceCard(
                         icon = Icons.Filled.Payments,
                         balance = cashBalance,
                         typeName = "Cash"
-                    )
+                    )*/
                 }
             }
             item { TransactionList(navController = navController) }
@@ -202,12 +201,12 @@ fun CurrentBalance(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
+            /*Text(
                 text = "Total Balance",
                 fontSize = 20.sp,
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.SemiBold
-            )
+            )*/
             Text(
                 text = "₹${cb.toString()}0",
                 fontSize = 55.sp,
@@ -271,13 +270,14 @@ fun TransactionList(
     ){
         Text(
             text = "Transactions",
-            fontSize = 22.sp,
+            fontSize = 28.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier
                 .weight(1f)
         )
         IconButton(onClick = { navController.navigate("TransactionScreen") }) {
             Icon(
+                modifier = modifier.padding(10.dp),
                 imageVector = Icons.Filled.NavigateNext,
                 contentDescription = ""
             )

@@ -164,7 +164,7 @@ fun InputScreen(
                     }
                 }
             }
-            item {
+            /*item {
                 // Choose Cash or Card
                 Row(
                     modifier = Modifier
@@ -198,7 +198,7 @@ fun InputScreen(
                         }
                     }
                 }
-            }
+            }*/
             item {
                 // Transaction Title Input
                 OutlinedTextField(
